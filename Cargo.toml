@@ -1,0 +1,16 @@
+[package]
+name = "myip-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-std = { version = "1.12.0", features = [ "attributes" ] }
+futures-lite = { version = "1.13.0" , default-features = false }
+
+# Some optimizations to reduce binary size
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
