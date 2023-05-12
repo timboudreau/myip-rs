@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# PROVIDE: myip
+# REQUIRE: DAEMON
+
+. /etc/rc.subr
+
+name="myip"
+rcvar="myip_enable"
+
+start_cmd="myip_start"
+sig_stop="TERM"
+pidfile="/var/run/${name}.pid"
+
+command="/sbin/myip-rs"
+
+load_rc_config $name
+
+myip_start(){
+    echo "Starting ${name}"
+    /usr/sbin/daemon -o "/var/log/${name}.log" -t "${name}" -p "${pidfile}" "${command}"
+}
+
+run_rc_command "$1"

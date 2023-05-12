@@ -1,0 +1,3 @@
+myip_enable="YES"
+myip6_enable="YES"
+
