@@ -18,8 +18,16 @@ const HEAD: &str = "HTTP/1.1 200 OK\r\ncontent-type: text/plain;charset=utf-8\r\
 
 #[async_std::main]
 async fn main() {
-    log("Startup");
-    let listener = TcpListener::bind("::0:8090").await.unwrap();
+    // On Linux, listening on ipv6 gets you translated ipv4 addresses
+    // On FreeBSD, it gets you only ipv6 addresses, and you need a separate
+    // ipv4 process to handle those
+    let addr = if is_ipv6() {
+        "::0:8190"
+    } else {
+        "0.0.0.0:8190"
+    };
+    log(format!("Startup on {}", addr));
+    let listener = TcpListener::bind(addr).await.unwrap();
     let mut incoming = listener.incoming();
     while let Some(stream) = incoming.find(|_x| true).await {
         match stream {
@@ -27,6 +35,12 @@ async fn main() {
             Err(e) => log_err(&e),
         }
     }
+}
+
+fn is_ipv6() -> bool {
+    let args: Vec<String> = std::env::args().collect();
+    let exp = String::from("-6");
+    args.contains(&exp)
 }
 
 async fn handle_connection(mut stream: TcpStream) {
